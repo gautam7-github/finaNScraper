@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from flask.wrappers import Response
 from . import scraper
+
+
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
@@ -8,7 +10,7 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 @app.route("/")
 def home():
-    return "FinaNScraper"
+    return "FinaNScraper - Developed by ProdiGinix"
 
 
 @app.route("/help/")
@@ -24,5 +26,5 @@ def getter(symbol):
     return jsonify(data)
 
 
-# json.loads(jsonn)[0]['financials']['ttm'] - working
-app.run()
+if __name__ == "__main__":
+    app.run(debug=False)
