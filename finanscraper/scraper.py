@@ -77,7 +77,9 @@ def processMiscData(miscData=None):
         "/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[5]/div/div/div/div[3]/div[1]/div/fin-streamer[1]")[0].text
     beta = tree.xpath(
         "/html/body/div[1]/div/div/div[1]/div/div[3]/div[1]/div/div[1]/div/div/div/div[2]/div[2]/table/tbody/tr[2]/td[2]")[0].text
-    return name, price, beta
+    eps = tree.xpath(
+        "/html/body/div[1]/div/div/div[1]/div/div[3]/div[1]/div/div[1]/div/div/div/div[2]/div[2]/table/tbody/tr[4]/td[2]")[0].text
+    return name, price, beta, eps
 
 
 def startProcessing(baseUrl=None, symbol=None):
@@ -89,7 +91,9 @@ def startProcessing(baseUrl=None, symbol=None):
         f'{baseUrl}{symbol}/cash-flow?p={symbol}')
     miscData = get_page(
         f"{baseUrl}{symbol}/?p={symbol}")
-    name, price, beta = processMiscData(miscData)
+    # descriptive data
+    name, price, beta, eps = processMiscData(miscData)
+    # dataframe list
     dfs = [df_financials, df_balance_sheet, df_cash_flow]
     ls = []
     for df in dfs:
@@ -101,7 +105,8 @@ def startProcessing(baseUrl=None, symbol=None):
             "details": {
                 "company": name,
                 "last-price": price,
-                "beta": beta
+                "beta": beta,
+                "eps": eps
             },
         },
         {
@@ -117,8 +122,10 @@ def startProcessing(baseUrl=None, symbol=None):
     return data
 
 
-def main(symbol="TATASTEEL.NS"):
+def main(symbol: str = "TATASTEEL.NS"):
+    if not (symbol[-3:] == ".NS"):
+        symbol += ".NS"
     baseUrl = 'https://finance.yahoo.com/quote/'
     return startProcessing(
-        baseUrl=baseUrl, symbol=symbol
+        baseUrl=baseUrl, symbol=symbol.upper()
     )

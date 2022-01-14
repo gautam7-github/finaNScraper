@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask.wrappers import Response
-from ..finanscraper.scraper import scraper
+import scraper
 
 
 app = Flask(__name__)
