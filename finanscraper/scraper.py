@@ -69,7 +69,9 @@ def scrape_table(url):
     return df
 
 
-def processMiscData(miscData=None):
+def processMiscData(baseUrl: str = None, symbol: str = None):
+    miscData = get_page(
+        f"{baseUrl}{symbol}/?p={symbol}")
     tree = html.fromstring(miscData.content)
     name = tree.xpath(
         "//*[@id=\"quote-header-info\"]/div[2]/div[1]/div[1]/h1")[0].text
@@ -82,19 +84,18 @@ def processMiscData(miscData=None):
     return name, price, beta, eps
 
 
-def startProcessing(baseUrl=None, symbol=None):
+def startProcessing(baseUrl: str = None, symbol: str = None, all: bool = True):
     df_financials = scrape_table(
         f'{baseUrl}{symbol}/financials?p={symbol}')
     df_balance_sheet = scrape_table(
         f'{baseUrl}{symbol}/balance-sheet?p={symbol}')
     df_cash_flow = scrape_table(
         f'{baseUrl}{symbol}/cash-flow?p={symbol}')
-    miscData = get_page(
-        f"{baseUrl}{symbol}/?p={symbol}")
     # descriptive data
-    name, price, beta, eps = processMiscData(miscData)
+    name, price, beta, eps = processMiscData(baseUrl, symbol)
     # dataframe list
-    dfs = [df_financials, df_balance_sheet, df_cash_flow]
+    if all:
+        dfs = [df_financials, df_balance_sheet, df_cash_flow]
     ls = []
     for df in dfs:
         df.index = df["Date"]
@@ -122,7 +123,7 @@ def startProcessing(baseUrl=None, symbol=None):
     return data
 
 
-def main(symbol: str = "TATASTEEL.NS"):
+def main(symbol: str = "TATASTEEL.NS", all: bool = True, fcls: bool = True, bsheet: bool = True, cflow: bool = True):
     if not (symbol[-3:] == ".NS"):
         symbol += ".NS"
     baseUrl = 'https://finance.yahoo.com/quote/'
