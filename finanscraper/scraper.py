@@ -1,10 +1,17 @@
 from datetime import datetime
 from lxml import html
-from pandas.core import base
 import requests
 import numpy as np
 import pandas as pd
 import json
+import enum
+
+
+class Choice(enum.Enum):
+    all = 1
+    financials = 2
+    balance_sheet = 3
+    cash_flow = 4
 
 
 def get_page(url):
@@ -84,19 +91,17 @@ def processMiscData(baseUrl: str = None, symbol: str = None):
     return name, price, beta, eps
 
 
-def startProcessing(baseUrl: str = None, symbol: str = None, all: bool = True):
-    df_financials = scrape_table(
-        f'{baseUrl}{symbol}/financials?p={symbol}')
-    df_balance_sheet = scrape_table(
-        f'{baseUrl}{symbol}/balance-sheet?p={symbol}')
-    df_cash_flow = scrape_table(
-        f'{baseUrl}{symbol}/cash-flow?p={symbol}')
-    # descriptive data
-    name, price, beta, eps = processMiscData(baseUrl, symbol)
-    # dataframe list
-    if all:
+def startProcessing(baseUrl: str = None, symbol: str = None, choice: Choice = Choice.all):
+    if choice == Choice.all:
+        df_financials = scrape_table(
+            f'{baseUrl}{symbol}/financials?p={symbol}')
+        df_balance_sheet = scrape_table(
+            f'{baseUrl}{symbol}/balance-sheet?p={symbol}')
+        df_cash_flow = scrape_table(
+            f'{baseUrl}{symbol}/cash-flow?p={symbol}')
         dfs = [df_financials, df_balance_sheet, df_cash_flow]
     ls = []
+    name, price, beta, eps = processMiscData(baseUrl, symbol)
     for df in dfs:
         df.index = df["Date"]
         df.drop(labels="Date", axis=1, inplace=True)
@@ -123,10 +128,10 @@ def startProcessing(baseUrl: str = None, symbol: str = None, all: bool = True):
     return data
 
 
-def main(symbol: str = "TATASTEEL.NS", all: bool = True, fcls: bool = True, bsheet: bool = True, cflow: bool = True):
+def main(symbol: str = "TATASTEEL.NS", choice: Choice = Choice.all):
     if not (symbol[-3:] == ".NS"):
         symbol += ".NS"
     baseUrl = 'https://finance.yahoo.com/quote/'
     return startProcessing(
-        baseUrl=baseUrl, symbol=symbol.upper()
+        baseUrl=baseUrl, symbol=symbol.upper(), choice=choice
     )

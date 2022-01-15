@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, render_template
+from finanscraper.scraper import Choice
 import scraper
 
 
@@ -21,23 +22,26 @@ def help():
 
 @app.route("/api/data/<string:symbol>/all")
 def getter(symbol):
-    data = scraper.main(symbol.upper(), all=True)
+    data = scraper.main(symbol.upper(), choice=Choice.all)
     return jsonify(data)
 
 
-@app.route("api/data/<string:symbol>/financials")
-def fngetter(symbol):
-    pass
+# @app.route("api/data/<string:symbol>/financials")
+# def fngetter(symbol):
+#     data = scraper.main(symbol.upper(), choice=Choice.financials)
+#     return jsonify(data)
 
 
-@app.route("api/data/<string:symbol>/balance-sheet")
-def bshgetter(symbol):
-    pass
+# @app.route("api/data/<string:symbol>/balance-sheet")
+# def bshgetter(symbol):
+#     data = scraper.main(symbol.upper(), choice=Choice.balance_sheet)
+#     return jsonify(data)
 
 
-@app.route("api/data/<string:symbol>/cash-flow")
-def cflwgetter(symbol):
-    pass
+# @app.route("api/data/<string:symbol>/cash-flow")
+# def cflwgetter(symbol):
+#     data = scraper.main(symbol.upper(), choice=Choice.cash_flow)
+#     return jsonify(data)
 
 
 if __name__ == "__main__":
