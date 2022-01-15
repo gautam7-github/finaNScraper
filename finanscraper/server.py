@@ -15,9 +15,7 @@ def home():
 
 @app.route("/api/help/")
 def help():
-    return """
-        <h1>FinaNScraper - HELP</h1>
-    """
+    return render_template("help.html")
 
 
 @app.route("/api/data/<string:symbol>/all")
